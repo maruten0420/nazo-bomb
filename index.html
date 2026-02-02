@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bomb Defusal Mission</title>
-    <!-- デジタル時計風フォント -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <!-- デジタル時計風フォント (VT323: 7セグ/ドットマトリクス風, Orbitron: タイトル用) -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #1a1a1a;
-            --panel-color: #2a2a2a;
+            --bg-color: #0d0d0d;
+            --panel-color: #1a1a1a;
             --text-color: #ffffff;
             --accent-red: #ff3333;
             /* ワイヤーの色定義 */
@@ -31,6 +31,12 @@
             margin: 0;
             padding: 0;
             background-color: var(--bg-color);
+            /* 配線・基盤っぽい背景パターン */
+            background-image: 
+                linear-gradient(rgba(30, 30, 30, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 30, 30, 0.5) 1px, transparent 1px),
+                linear-gradient(45deg, transparent 48%, rgba(50, 20, 20, 0.1) 49%, rgba(50, 20, 20, 0.1) 51%, transparent 52%);
+            background-size: 40px 40px, 40px 40px, 100% 100%;
             color: var(--text-color);
             font-family: 'Helvetica Neue', Arial, sans-serif;
             height: 100vh;
@@ -39,6 +45,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+        
+        /* 画面四隅のビネット効果（暗くする） */
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle, transparent 40%, #000 100%);
+            pointer-events: none;
+            z-index: 5;
         }
 
         /* 画面コンテナ (全画面を覆う) */
@@ -52,7 +68,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background-color: var(--bg-color);
+            background: transparent; /* 背景透過 */
             transition: opacity 0.3s ease;
             z-index: 10;
         }
@@ -73,6 +89,10 @@
             margin-bottom: 2rem;
             text-align: center;
             letter-spacing: 2px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: 1px solid #333;
         }
 
         .btn {
@@ -87,8 +107,9 @@
             width: 240px;
             text-align: center;
             border-radius: 4px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
             font-family: 'Orbitron', sans-serif;
+            z-index: 20; /* ビネットより上に */
         }
 
         .btn:active {
@@ -103,7 +124,7 @@
 
         /* 設定パネル */
         .settings-panel {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(10, 10, 10, 0.95);
             padding: 20px;
             border: 1px solid #444;
             border-radius: 8px;
@@ -111,6 +132,8 @@
             text-align: center;
             width: 90%;
             max-width: 400px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            z-index: 20;
         }
         
         .slider-row {
@@ -146,18 +169,25 @@
             border-radius: 8px;
             padding: 5px 20px;
             margin-bottom: 2vh;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
             display: flex;
             justify-content: center;
             align-items: center;
+            /* 幅固定 */
+            width: 320px; /* VT323用に少し幅広に */
+            min-width: 300px;
         }
 
         #timer-display {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(3rem, 8vh, 5rem); /* 画面サイズに合わせて可変 */
+            font-family: 'VT323', monospace; /* 7セグメント/端末風フォント */
+            font-variant-numeric: tabular-nums; /* 数字の幅を等幅に */
+            font-size: 5rem; /* フォントに合わせてサイズ調整 */
             color: #ff0000;
-            letter-spacing: 5px;
+            letter-spacing: 4px;
             line-height: 1;
+            text-align: center;
+            width: 100%;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7); /* 発光表現 */
         }
 
         /* 中部: 謎画像エリア */
@@ -165,8 +195,8 @@
             flex: 1 1 auto; /* 残りのスペースを埋める */
             width: 100%;
             max-width: 1000px;
-            border: 2px dashed #444;
-            background: #111;
+            border: 2px dashed #555;
+            background: rgba(0, 0, 0, 0.8);
             margin-bottom: 2vh;
             display: flex;
             justify-content: center;
@@ -174,6 +204,26 @@
             overflow: hidden;
             position: relative;
             border-radius: 4px;
+            box-shadow: inset 0 0 30px #000;
+        }
+
+        /* 問題番号表示 */
+        #question-number {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 12px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            z-index: 10;
+            pointer-events: none; /* クリック透過 */
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
         }
 
         #puzzle-img {
@@ -192,10 +242,20 @@
             justify-content: space-around; /* 均等配置 */
             align-items: center;
             background: #222;
-            border-top: 4px solid #333;
+            border: 1px solid #444;
+            border-bottom: none;
             padding: 10px;
             border-radius: 8px 8px 0 0;
             position: relative;
+            background: repeating-linear-gradient(
+                45deg,
+                #222,
+                #222 10px,
+                #1a1a1a 10px,
+                #1a1a1a 20px
+            ); /* 縞鋼板風の背景 */
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+            z-index: 20;
         }
 
         /* ネジ飾り */
@@ -203,9 +263,20 @@
             position: absolute;
             width: 12px;
             height: 12px;
-            background: #555;
+            background: linear-gradient(135deg, #777, #333);
             border-radius: 50%;
-            box-shadow: inset 1px 1px 2px #000;
+            box-shadow: 1px 1px 2px #000;
+            border: 1px solid #222;
+        }
+        .screw::after { /* プラスネジの溝 */
+            content: '+';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #222;
+            font-size: 12px;
+            line-height: 10px;
+            font-family: sans-serif;
         }
         .screw.tl { top: 10px; left: 10px; }
         .screw.tr { top: 10px; right: 10px; }
@@ -230,11 +301,11 @@
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 16px; /* 線の太さ */
+            width: 18px; /* 線の太さ */
             border-radius: 8px;
             box-shadow: 
-                inset -2px 0 5px rgba(0,0,0,0.5), /* 立体感 */
-                3px 3px 5px rgba(0,0,0,0.5); /* 影 */
+                inset -4px 0 6px rgba(0,0,0,0.6), /* 立体感強調 */
+                5px 5px 8px rgba(0,0,0,0.6); /* 影 */
             z-index: 2;
             transition: background 0.1s;
         }
@@ -263,7 +334,7 @@
             width: 100%;
             height: 40%; /* 真ん中の20%が消える */
             border-radius: 8px;
-            box-shadow: inset -2px 0 5px rgba(0,0,0,0.5);
+            box-shadow: inset -3px 0 5px rgba(0,0,0,0.6);
         }
         .cut .wire::before { top: 0; }
         .cut .wire::after { bottom: 0; }
@@ -277,12 +348,12 @@
         .cut .wire.white::before, .cut .wire.white::after { background: var(--wire-white); }
 
         /* 銅線の断面っぽく見せる丸 */
-        .cut .wire::before { border-bottom: 2px solid #b87333; }
-        .cut .wire::after { border-top: 2px solid #b87333; }
+        .cut .wire::before { border-bottom: 3px solid #b87333; }
+        .cut .wire::after { border-top: 3px solid #b87333; }
 
 
         /* --- ゲームオーバー・クリア演出 --- */
-        #gameover-screen { background-color: rgba(20, 0, 0, 0.95); }
+        #gameover-screen { background-color: rgba(20, 0, 0, 0.95); z-index: 50; }
         .status-text {
             font-family: 'Orbitron', sans-serif;
             font-size: 4rem;
@@ -319,6 +390,8 @@
     <audio id="se-cut" preload="auto"><source src="deco/se_cut.mp3" type="audio/mpeg"></audio>
     <audio id="se-explode" preload="auto"><source src="deco/se_explode.mp3" type="audio/mpeg"></audio>
     <audio id="se-clear" preload="auto"><source src="deco/se_clear.mp3" type="audio/mpeg"></audio>
+    <!-- 追加: タイマー用SE -->
+    <audio id="se-timer" preload="auto"><source src="deco/se_timer.mp3" type="audio/mpeg"></audio>
 
     <!-- 1. タイトル画面 -->
     <div id="title-screen" class="screen">
@@ -345,11 +418,12 @@
     <div id="game-screen" class="screen hidden">
         <!-- 上部：タイマー -->
         <div class="timer-container">
-            <span id="timer-display">60.00</span>
+            <span id="timer-display">30.00</span>
         </div>
 
         <!-- 中部：謎画像 -->
         <div class="puzzle-container">
+            <div id="question-number">Q. 000</div> <!-- 問題番号表示エリア -->
             <img id="puzzle-img" src="" alt="Cryptic Puzzle">
         </div>
 
@@ -393,9 +467,14 @@
          * ============================================================
          */
         const PROBLEM_LIST = [
-            "q1_100000.png",  // サンプル: 赤
-            "q2_011000.png",  // サンプル: 青・黄
-            "q3_000001.png",  // サンプル: 白
+            "001_100000.png",  
+            "002_000100.png",  
+            "003_000100.png",  
+            "004_100000.png", 
+            "005_011111.png", 
+            "006_001101.png",
+            "007_010010.png",
+            "008_000001.png",
             // ここにファイル名を追加...
         ];
 
@@ -405,6 +484,7 @@
             seCut: document.getElementById('se-cut'),
             seExplode: document.getElementById('se-explode'),
             seClear: document.getElementById('se-clear'),
+            seTimer: document.getElementById('se-timer'), // 追加
 
             init: function() {
                 this.updateVolume();
@@ -416,6 +496,7 @@
                 this.seCut.volume = seVol;
                 this.seExplode.volume = seVol;
                 this.seClear.volume = seVol;
+                this.seTimer.volume = seVol; // 追加
             },
 
             playBGM: function() {
@@ -440,6 +521,13 @@
             playClear: function() {
                 this.stopBGM();
                 this.seClear.play();
+            },
+
+            // 追加: タイマー音再生
+            playTimer: function() {
+                // 再生中ならリセットして重ねて鳴らす
+                this.seTimer.currentTime = 0;
+                this.seTimer.play().catch(e => {/* console.log("Timer SE error", e) */});
             }
         };
 
@@ -486,6 +574,13 @@
                 document.getElementById('timer-display').innerText = displayVal.toFixed(2);
             },
 
+            // 問題番号の更新
+            updateQuestionNumber: function(num) {
+                // 3桁ゼロ埋め
+                const paddedNum = String(num).padStart(3, '0');
+                document.getElementById('question-number').innerText = "Q. " + paddedNum;
+            },
+
             setPuzzleImage: function(fileName) {
                 // パスを nazo/ に指定
                 document.getElementById('puzzle-img').src = "nazo/" + fileName;
@@ -505,7 +600,7 @@
 
         /* --- Game Logic: ゲーム進行 --- */
         const Game = {
-            timeLeft: 60.00,
+            timeLeft: 10.00,
             timerId: null,
             problems: [],
             currentProblemIdx: 0,
@@ -522,7 +617,7 @@
                 this.problems = [...PROBLEM_LIST].sort(() => Math.random() - 0.5);
                 
                 this.isActive = true;
-                this.timeLeft = 60.00;
+                this.timeLeft = 30.00;
                 this.currentProblemIdx = 0;
                 
                 AudioMgr.init();
@@ -556,6 +651,8 @@
                 // 切断状態リセット
                 this.currentCutState = [0, 0, 0, 0, 0, 0];
                 
+                // UI更新
+                UI.updateQuestionNumber(this.currentProblemIdx + 1); // 1からスタート
                 UI.resetWires();
                 UI.setPuzzleImage(fileName);
             },
@@ -565,11 +662,28 @@
                 this.timerId = setInterval(() => {
                     if (!this.isActive) return;
 
+                    // 変更前の「切り上げ整数秒」を記録 (例: 10.01 -> 11)
+                    const prevTimeCeil = Math.ceil(this.timeLeft);
+
                     this.timeLeft -= 0.01;
+                    
+                    // 浮動小数点誤差を丸める (例: 10.00000004 -> 10.00)
+                    this.timeLeft = Math.round(this.timeLeft * 100) / 100;
+
                     if (this.timeLeft <= 0) {
                         this.timeLeft = 0;
                         this.gameOver();
                     }
+
+                    // 変更後の「切り上げ整数秒」を確認
+                    const currentTimeCeil = Math.ceil(this.timeLeft);
+
+                    // 整数秒を跨いだ瞬間 (例: 10.01[11] -> 10.00[10]) に音を鳴らす
+                    // ※残り0秒の時は爆発音が優先されるので鳴らさない
+                    if (currentTimeCeil < prevTimeCeil && this.timeLeft > 0) {
+                        AudioMgr.playTimer();
+                    }
+
                     UI.updateTimer(this.timeLeft);
                 }, 10);
             },
@@ -614,8 +728,13 @@
             },
 
             problemCleared: function() {
-                // 時間ボーナス
-                this.timeLeft += 10.00;
+                // 正解の本数をカウント (配列中の 1 の数)
+                const correctCount = this.currentSolution.filter(bit => bit === 1).length;
+                
+                // 回復量の計算: max(10 - ((正解数-1)*0.1), 1.0)
+                const recovery = Math.max(10 - ((correctCount - 1) * 0.1), 1.0);
+                
+                this.timeLeft += recovery;
                 if(this.timeLeft > 99.99) this.timeLeft = 99.99;
                 
                 // 次へ
