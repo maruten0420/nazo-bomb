@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bomb Defusal Mission</title>
-    <!-- デジタル時計風フォント (VT323: 7セグ/ドットマトリクス風, Orbitron: タイトル用) -->
+    <!-- デジタル時計風フォント -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -23,7 +23,7 @@
 
         * {
             box-sizing: border-box;
-            user-select: none; /* テキスト選択禁止 */
+            user-select: none;
             -webkit-user-select: none;
         }
 
@@ -31,7 +31,6 @@
             margin: 0;
             padding: 0;
             background-color: var(--bg-color);
-            /* 配線・基盤っぽい背景パターン */
             background-image: 
                 linear-gradient(rgba(30, 30, 30, 0.5) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(30, 30, 30, 0.5) 1px, transparent 1px),
@@ -41,13 +40,12 @@
             font-family: 'Helvetica Neue', Arial, sans-serif;
             height: 100vh;
             width: 100vw;
-            overflow: hidden; /* スクロール禁止 */
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
         }
         
-        /* 画面四隅のビネット効果（暗くする） */
         body::after {
             content: "";
             position: absolute;
@@ -57,30 +55,21 @@
             z-index: 5;
         }
 
-        /* 画面コンテナ (全画面を覆う) */
         .screen {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: transparent; /* 背景透過 */
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            background: transparent;
             transition: opacity 0.3s ease;
             z-index: 10;
         }
 
         .hidden {
-            opacity: 0;
-            pointer-events: none;
-            z-index: -1;
-            display: none !important; /* レイアウト崩れ防止のためdisplayも消す */
+            opacity: 0; pointer-events: none; z-index: -1; display: none !important;
         }
 
-        /* --- タイトル画面 & 共通UI --- */
+        /* --- タイトル & UI --- */
         h1 {
             font-family: 'Orbitron', sans-serif;
             font-size: clamp(2rem, 5vw, 4rem);
@@ -109,20 +98,11 @@
             border-radius: 4px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.5);
             font-family: 'Orbitron', sans-serif;
-            z-index: 20; /* ビネットより上に */
+            z-index: 20;
         }
+        .btn:active { transform: translateY(2px); box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .btn:hover { border-color: var(--accent-red); color: var(--accent-red); }
 
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-
-        .btn:hover {
-            border-color: var(--accent-red);
-            color: var(--accent-red);
-        }
-
-        /* 設定パネル */
         .settings-panel {
             background: rgba(10, 10, 10, 0.95);
             padding: 20px;
@@ -130,38 +110,21 @@
             border-radius: 8px;
             margin-top: 20px;
             text-align: center;
-            width: 90%;
-            max-width: 400px;
+            width: 90%; max-width: 400px;
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
             z-index: 20;
         }
         
         .slider-row {
-            display: flex;
-            align-items: center;
-            margin: 15px 0;
+            display: flex; align-items: center; margin: 15px 0;
             font-family: 'Orbitron', sans-serif;
         }
-        
-        .slider-label {
-            width: 60px;
-            text-align: right;
-            margin-right: 15px;
-            font-weight: bold;
-        }
-        
-        input[type=range] {
-            flex-grow: 1;
-            cursor: pointer;
-        }
+        .slider-label { width: 60px; text-align: right; margin-right: 15px; font-weight: bold; }
+        input[type=range] { flex-grow: 1; cursor: pointer; }
 
-        /* --- ゲーム画面レイアウト --- */
-        #game-screen {
-            justify-content: flex-start;
-            padding: 2vh 2vw;
-        }
+        /* --- ゲーム画面 --- */
+        #game-screen { justify-content: flex-start; padding: 2vh 2vw; }
 
-        /* 上部: タイマー */
         .timer-container {
             flex: 0 0 auto;
             background: #000;
@@ -170,186 +133,163 @@
             padding: 5px 20px;
             margin-bottom: 2vh;
             box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* 幅固定 */
-            width: 320px; /* VT323用に少し幅広に */
-            min-width: 300px;
+            display: flex; justify-content: center; align-items: center;
+            width: 320px; min-width: 300px;
         }
 
         #timer-display {
-            font-family: 'VT323', monospace; /* 7セグメント/端末風フォント */
-            font-variant-numeric: tabular-nums; /* 数字の幅を等幅に */
-            font-size: 5rem; /* フォントに合わせてサイズ調整 */
+            font-family: 'VT323', monospace;
+            font-variant-numeric: tabular-nums;
+            font-size: 5rem;
             color: #ff0000;
             letter-spacing: 4px;
             line-height: 1;
             text-align: center;
             width: 100%;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7); /* 発光表現 */
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
         }
 
-        /* 中部: 謎画像エリア */
         .puzzle-container {
-            flex: 1 1 auto; /* 残りのスペースを埋める */
-            width: 100%;
-            max-width: 1000px;
+            flex: 1 1 auto;
+            width: 100%; max-width: 1000px;
             border: 2px dashed #555;
             background: rgba(0, 0, 0, 0.8);
             margin-bottom: 2vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; position: relative;
             border-radius: 4px;
             box-shadow: inset 0 0 30px #000;
         }
 
-        /* 問題番号表示 */
         #question-number {
-            position: absolute;
-            top: 10px;
-            left: 10px;
+            position: absolute; top: 10px; left: 10px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #fff;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 5px 12px;
-            border: 1px solid #555;
-            border-radius: 4px;
-            z-index: 10;
-            pointer-events: none; /* クリック透過 */
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-            letter-spacing: 1px;
+            font-size: 1.5rem; font-weight: bold;
+            color: #fff; background: rgba(0, 0, 0, 0.7);
+            padding: 5px 12px; border: 1px solid #555;
+            border-radius: 4px; z-index: 10; pointer-events: none;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5); letter-spacing: 1px;
         }
 
         #puzzle-img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: block;
+            max-width: 100%; max-height: 100%;
+            object-fit: contain; display: block;
         }
 
-        /* 下部: ワイヤーエリア */
+        /* --- ワイヤーエリア --- */
         .wires-container {
-            flex: 0 0 25vh; /* 高さ固定(画面の25%) */
-            width: 100%;
-            max-width: 800px;
-            display: flex;
-            justify-content: space-around; /* 均等配置 */
-            align-items: center;
+            flex: 0 0 25vh;
+            width: 100%; max-width: 800px;
+            display: flex; justify-content: space-around; align-items: center;
             background: #222;
-            border: 1px solid #444;
-            border-bottom: none;
-            padding: 10px;
+            border: 1px solid #444; border-bottom: none;
+            padding: 10px 0;
             border-radius: 8px 8px 0 0;
             position: relative;
-            background: repeating-linear-gradient(
-                45deg,
-                #222,
-                #222 10px,
-                #1a1a1a 10px,
-                #1a1a1a 20px
-            ); /* 縞鋼板風の背景 */
+            background: repeating-linear-gradient(45deg, #222, #222 10px, #1a1a1a 10px, #1a1a1a 20px);
             box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
             z-index: 20;
         }
 
-        /* ネジ飾り */
         .screw {
-            position: absolute;
-            width: 12px;
-            height: 12px;
+            position: absolute; width: 12px; height: 12px;
             background: linear-gradient(135deg, #777, #333);
             border-radius: 50%;
-            box-shadow: 1px 1px 2px #000;
-            border: 1px solid #222;
+            box-shadow: 1px 1px 2px #000; border: 1px solid #222;
         }
-        .screw::after { /* プラスネジの溝 */
-            content: '+';
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            color: #222;
-            font-size: 12px;
-            line-height: 10px;
-            font-family: sans-serif;
+        .screw::after {
+            content: '+'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); color: #222;
+            font-size: 12px; line-height: 10px; font-family: sans-serif;
         }
         .screw.tl { top: 10px; left: 10px; }
         .screw.tr { top: 10px; right: 10px; }
 
-        /* ワイヤー個別の枠 */
         .wire-slot {
-            position: relative;
-            height: 100%;
-            width: 14%; /* 6本なので余裕を持って */
-            display: flex;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.1s;
+            position: relative; height: 100%; width: 14%;
+            display: flex; justify-content: center;
+            cursor: pointer; transition: transform 0.1s;
+            /* 上下の穴の描画 */
+            background-image: 
+                radial-gradient(circle at center 12px, #000 0px, #000 6px, #333 7px, transparent 8px),
+                radial-gradient(circle at center calc(100% - 12px), #000 0px, #000 6px, #333 7px, transparent 8px);
+            background-repeat: no-repeat;
         }
+        .wire-slot:active { transform: scale(0.95); }
 
-        .wire-slot:active {
-            transform: scale(0.95);
-        }
-
-        /* ワイヤー本体 (CSS描画) */
+        /* --- ワイヤー本体 --- */
         .wire {
             position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 18px; /* 線の太さ */
-            border-radius: 8px;
-            box-shadow: 
-                inset -4px 0 6px rgba(0,0,0,0.6), /* 立体感強調 */
-                5px 5px 8px rgba(0,0,0,0.6); /* 影 */
+            top: 12px; bottom: 12px; left: 50%;
+            width: 14px; /* ワイヤー太さ */
+            transform: translateX(-50%);
+            border-radius: 4px;
+            box-shadow: inset -4px 0 6px rgba(0,0,0,0.6), 4px 4px 6px rgba(0,0,0,0.6);
             z-index: 2;
             transition: background 0.1s;
+            
+            /* CSS変数初期値 (JSで書き換える) */
+            --wire-color: #555;
+            --angle-top: 15deg;
+            --angle-bottom: -15deg;
         }
 
-        /* ワイヤーの色 */
-        .wire.red { background: var(--wire-red); }
-        .wire.blue { background: var(--wire-blue); }
-        .wire.yellow { background: var(--wire-yellow); }
-        .wire.green { background: var(--wire-green); }
-        .wire.black { background: var(--wire-black); border: 1px solid #444; }
-        .wire.white { background: var(--wire-white); }
+        /* 各色の設定（色を変数として保持） */
+        .wire.red { --wire-color: var(--wire-red); background: var(--wire-color); }
+        .wire.blue { --wire-color: var(--wire-blue); background: var(--wire-color); }
+        .wire.yellow { --wire-color: var(--wire-yellow); background: var(--wire-color); }
+        .wire.green { --wire-color: var(--wire-green); background: var(--wire-color); }
+        .wire.black { --wire-color: var(--wire-black); background: var(--wire-color); border: 1px solid #444; }
+        .wire.white { --wire-color: var(--wire-white); background: var(--wire-color); }
 
-        /* 切断された状態のスタイル */
+        /* --- 切断時のスタイル --- */
         .cut .wire {
-            background: transparent !important;
-            box-shadow: none;
-            border: none;
+            background: transparent !important; /* 元の棒は透明に */
+            box-shadow: none; border: none;
         }
 
-        /* 切断面の描画 */
+        /* 切断されたワイヤーの描画 (直線バージョンに戻しました) */
         .cut .wire::before,
         .cut .wire::after {
             content: '';
             position: absolute;
-            left: 0;
-            width: 100%;
-            height: 40%; /* 真ん中の20%が消える */
-            border-radius: 8px;
-            box-shadow: inset -3px 0 5px rgba(0,0,0,0.6);
+            left: 50%;
+            width: 14px; /* ワイヤーの太さ */
+            height: 45%;
+            background: var(--wire-color); /* 背景色で描画 */
+            box-shadow: inset -4px 0 6px rgba(0,0,0,0.6), 4px 4px 6px rgba(0,0,0,0.6); /* 影も戻す */
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateX(-50%); /* 中央揃え */
+            border-radius: 4px;
         }
-        .cut .wire::before { top: 0; }
-        .cut .wire::after { bottom: 0; }
 
-        /* 切断面の色適用 */
-        .cut .wire.red::before, .cut .wire.red::after { background: var(--wire-red); }
-        .cut .wire.blue::before, .cut .wire.blue::after { background: var(--wire-blue); }
-        .cut .wire.yellow::before, .cut .wire.yellow::after { background: var(--wire-yellow); }
-        .cut .wire.green::before, .cut .wire.green::after { background: var(--wire-green); }
-        .cut .wire.black::before, .cut .wire.black::after { background: var(--wire-black); }
-        .cut .wire.white::before, .cut .wire.white::after { background: var(--wire-white); }
+        /* 上半分 */
+        .cut .wire::before {
+            top: 0; 
+            transform-origin: top center; /* 穴を支点に回転 */
+            transform: translateX(-50%) rotate(var(--angle-top)); 
+            
+            /* 断面 */
+            border-bottom: 4px solid #b87333; 
+        }
 
-        /* 銅線の断面っぽく見せる丸 */
-        .cut .wire::before { border-bottom: 3px solid #b87333; }
-        .cut .wire::after { border-top: 3px solid #b87333; }
+        /* 下半分 */
+        .cut .wire::after {
+            bottom: 0;
+            transform-origin: bottom center; /* 穴を支点に回転 */
+            transform: translateX(-50%) rotate(var(--angle-bottom));
+
+            /* 断面 */
+            border-top: 4px solid #b87333;
+        }
+
+        /* 黒ワイヤーの場合だけborderが見えなくなるので微調整 */
+        .cut .wire.black::before, .cut .wire.black::after {
+            border: 1px solid #444;
+            border-top: none; border-bottom: none;
+        }
+        .cut .wire.black::before { border-bottom: 4px solid #b87333; }
+        .cut .wire.black::after { border-top: 4px solid #b87333; }
 
 
         /* --- ゲームオーバー・クリア演出 --- */
@@ -366,34 +306,16 @@
 
         @keyframes blink { from { opacity: 1; } to { opacity: 0.3; } }
 
-        /* メッセージ表示エリア (デバッグや状態表示用、今回は非表示だが拡張用に残す) */
-        #message-area {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: yellow;
-            font-size: 0.8rem;
-            opacity: 0.7;
-        }
-
     </style>
 </head>
 <body>
 
-    <!-- ==============================================
-         音声ファイルの読み込み
-         ※ GitHubにアップロードする際は deco/ フォルダに
-         該当のmp3ファイルを置いてください
-    =============================================== -->
     <audio id="bgm" loop preload="auto"><source src="deco/bgm.mp3" type="audio/mpeg"></audio>
     <audio id="se-cut" preload="auto"><source src="deco/se_cut.mp3" type="audio/mpeg"></audio>
     <audio id="se-explode" preload="auto"><source src="deco/se_explode.mp3" type="audio/mpeg"></audio>
     <audio id="se-clear" preload="auto"><source src="deco/se_clear.mp3" type="audio/mpeg"></audio>
-    <!-- 追加: タイマー用SE -->
     <audio id="se-timer" preload="auto"><source src="deco/se_timer.mp3" type="audio/mpeg"></audio>
 
-    <!-- 1. タイトル画面 -->
     <div id="title-screen" class="screen">
         <h1>BOMB DEFUSAL</h1>
         <div class="btn" onclick="Game.start()">MISSION START</div>
@@ -414,20 +336,14 @@
         </div>
     </div>
 
-    <!-- 2. ゲーム画面 -->
     <div id="game-screen" class="screen hidden">
-        <!-- 上部：タイマー -->
         <div class="timer-container">
             <span id="timer-display">30.00</span>
         </div>
-
-        <!-- 中部：謎画像 -->
         <div class="puzzle-container">
-            <div id="question-number">Q. 000</div> <!-- 問題番号表示エリア -->
+            <div id="question-number">Q. 000</div>
             <img id="puzzle-img" src="" alt="Cryptic Puzzle">
         </div>
-
-        <!-- 下部：6本のワイヤー (固定配置) -->
         <div class="wires-container">
             <div class="screw tl"></div><div class="screw tr"></div>
             <!-- 引数: 0=赤, 1=青, 2=黄, 3=緑, 4=黒, 5=白 -->
@@ -440,13 +356,11 @@
         </div>
     </div>
 
-    <!-- 3. ゲームオーバー画面 -->
     <div id="gameover-screen" class="screen hidden">
-        <div class="status-text text-explode">EXPLODED</div>
+        <div id="gameover-text" class="status-text text-explode">EXPLODED</div>
         <div class="btn" onclick="location.reload()">RETRY MISSION</div>
     </div>
 
-    <!-- 4. クリア画面 -->
     <div id="clear-screen" class="screen hidden" style="background: #001a00;">
         <div class="status-text text-clear">BOMB DEFUSED</div>
         <div style="margin-bottom:20px; color:#aaa;">All systems normalized.</div>
@@ -458,13 +372,6 @@
          * ============================================================
          * 設定エリア：問題リスト
          * -----------------------------------------------------------
-         * 1. 画像は "nazo" フォルダに入れてください。
-         * 2. ファイル名の命名規則: "任意の名前_正解コード.png"
-         * 正解コードは6桁の0/1 (赤,青,黄,緑,黒,白 の順)
-         * 1: 切るべき / 0: 切ってはいけない
-         * 例: "q1_100000.png" -> 赤だけ切ると正解
-         * 例: "q2_000001.png" -> 白だけ切ると正解
-         * ============================================================
          */
         const PROBLEM_LIST = [
             "001_100000.png",  
@@ -475,28 +382,53 @@
             "006_001101.png",
             "007_010010.png",
             "008_000001.png",
+            "009_110111.png",
+            "010_000001.png",
+            "011_000001.png",
+            "012_000010.png",
+            "013_000010.png",
+            "014_101111.png",
             // ここにファイル名を追加...
         ];
 
-        /* --- Audio Manager: 音声管理 --- */
         const AudioMgr = {
             bgm: document.getElementById('bgm'),
             seCut: document.getElementById('se-cut'),
             seExplode: document.getElementById('se-explode'),
             seClear: document.getElementById('se-clear'),
-            seTimer: document.getElementById('se-timer'), // 追加
+            seTimer: document.getElementById('se-timer'),
 
             init: function() {
+                // ローカルストレージから設定を読み込む
+                const savedBgm = localStorage.getItem('bomb_bgm_vol');
+                const savedSe = localStorage.getItem('bomb_se_vol');
+
+                // 保存された値があればスライダーに適用
+                if (savedBgm !== null) {
+                    document.getElementById('vol-bgm').value = savedBgm;
+                }
+                if (savedSe !== null) {
+                    document.getElementById('vol-se').value = savedSe;
+                }
+
+                // 音量を適用
                 this.updateVolume();
+                this.bgm.loop = true;
             },
 
             updateVolume: function() {
-                this.bgm.volume = document.getElementById('vol-bgm').value;
+                const bgmVol = document.getElementById('vol-bgm').value;
                 const seVol = document.getElementById('vol-se').value;
+
+                this.bgm.volume = bgmVol;
                 this.seCut.volume = seVol;
                 this.seExplode.volume = seVol;
                 this.seClear.volume = seVol;
-                this.seTimer.volume = seVol; // 追加
+                this.seTimer.volume = seVol;
+
+                // 変更された値を保存
+                localStorage.setItem('bomb_bgm_vol', bgmVol);
+                localStorage.setItem('bomb_se_vol', seVol);
             },
 
             playBGM: function() {
@@ -523,15 +455,12 @@
                 this.seClear.play();
             },
 
-            // 追加: タイマー音再生
             playTimer: function() {
-                // 再生中ならリセットして重ねて鳴らす
                 this.seTimer.currentTime = 0;
-                this.seTimer.play().catch(e => {/* console.log("Timer SE error", e) */});
+                this.seTimer.play().catch(e => {});
             }
         };
 
-        /* --- UI Manager: 画面遷移・表示 --- */
         const UI = {
             screens: {
                 title: document.getElementById('title-screen'),
@@ -541,9 +470,7 @@
             },
 
             showScreen: function(screenName) {
-                // 全スクリーンを非表示
                 Object.values(this.screens).forEach(el => el.classList.add('hidden'));
-                // 指定スクリーンを表示
                 if(this.screens[screenName]) {
                     this.screens[screenName].classList.remove('hidden');
                 }
@@ -558,58 +485,58 @@
                 alert(
                     "【MISSION BRIEFING】\n\n" +
                     "時限爆弾の解除コードを切断せよ。\n" +
+                    "コードの色は「赤・青・黄・緑・黒・白」の6つ。\n" +
                     "上部のモニターに表示される謎が解除コードのヒントだ。\n\n" +
                     "■ ルール\n" +
                     "1. 正解の色のワイヤーを全て切れ。\n" +
                     "2. 間違った色を切ると即爆発。\n" +
                     "3. 制限時間が0になると爆発。\n\n" +
-                    "正解ワイヤーを全て切るとタイマーが10秒回復し、次の問題へ進む。\n" +
-                    "健闘を祈る。"
+                    "正解ワイヤーを全て切るとタイマーが少しずつ回復し、次の問題へ進む。\n" +
+                    "諸君の健闘を祈る。"
                 );
             },
 
             updateTimer: function(time) {
-                // 99.99秒上限表示
                 const displayVal = time > 99.99 ? 99.99 : time;
                 document.getElementById('timer-display').innerText = displayVal.toFixed(2);
             },
 
-            // 問題番号の更新
             updateQuestionNumber: function(num) {
-                // 3桁ゼロ埋め
                 const paddedNum = String(num).padStart(3, '0');
                 document.getElementById('question-number').innerText = "Q. " + paddedNum;
             },
 
             setPuzzleImage: function(fileName) {
-                // パスを nazo/ に指定
                 document.getElementById('puzzle-img').src = "nazo/" + fileName;
-                
-                // 画像読み込みエラー時のハンドリング (開発用)
                 document.getElementById('puzzle-img').onerror = function() {
                     console.error("Image load failed: " + fileName);
-                    // 本番ではここでダミーを表示するか、次の問題へ飛ばす処理を入れると親切
                 };
             },
 
             resetWires: function() {
                 const slots = document.querySelectorAll('.wire-slot');
-                slots.forEach(slot => slot.classList.remove('cut'));
+                slots.forEach(slot => {
+                    slot.classList.remove('cut');
+                    // CSS変数をリセット
+                    const wire = slot.querySelector('.wire');
+                    if(wire) {
+                        wire.style.removeProperty('--angle-top');
+                        wire.style.removeProperty('--angle-bottom');
+                    }
+                });
             }
         };
 
-        /* --- Game Logic: ゲーム進行 --- */
         const Game = {
-            timeLeft: 10.00,
+            timeLeft: 30.00,
             timerId: null,
             problems: [],
             currentProblemIdx: 0,
-            currentSolution: [], // [0,1,0,...]
-            currentCutState: [], // [0,0,0,...]
+            currentSolution: [], 
+            currentCutState: [],
             isActive: false,
 
             start: function() {
-                // 問題リストのシャッフル
                 if (PROBLEM_LIST.length === 0) {
                     alert("No problems found in PROBLEM_LIST.");
                     return;
@@ -635,24 +562,18 @@
                 }
 
                 const fileName = this.problems[this.currentProblemIdx];
-                
-                // ファイル名パース: "xxx_101010.png" -> "101010"
                 const match = fileName.match(/_([01]{6})\./);
                 if (!match) {
                     console.error("Invalid filename format:", fileName);
-                    // エラー時はスキップして次へ
                     this.currentProblemIdx++;
                     this.loadProblem();
                     return;
                 }
 
-                // 正解配列作成
                 this.currentSolution = match[1].split('').map(Number);
-                // 切断状態リセット
                 this.currentCutState = [0, 0, 0, 0, 0, 0];
                 
-                // UI更新
-                UI.updateQuestionNumber(this.currentProblemIdx + 1); // 1からスタート
+                UI.updateQuestionNumber(this.currentProblemIdx + 1);
                 UI.resetWires();
                 UI.setPuzzleImage(fileName);
             },
@@ -662,24 +583,16 @@
                 this.timerId = setInterval(() => {
                     if (!this.isActive) return;
 
-                    // 変更前の「切り上げ整数秒」を記録 (例: 10.01 -> 11)
                     const prevTimeCeil = Math.ceil(this.timeLeft);
-
                     this.timeLeft -= 0.01;
-                    
-                    // 浮動小数点誤差を丸める (例: 10.00000004 -> 10.00)
                     this.timeLeft = Math.round(this.timeLeft * 100) / 100;
 
                     if (this.timeLeft <= 0) {
                         this.timeLeft = 0;
-                        this.gameOver();
+                        this.gameOver('timeout');
                     }
 
-                    // 変更後の「切り上げ整数秒」を確認
                     const currentTimeCeil = Math.ceil(this.timeLeft);
-
-                    // 整数秒を跨いだ瞬間 (例: 10.01[11] -> 10.00[10]) に音を鳴らす
-                    // ※残り0秒の時は爆発音が優先されるので鳴らさない
                     if (currentTimeCeil < prevTimeCeil && this.timeLeft > 0) {
                         AudioMgr.playTimer();
                     }
@@ -691,28 +604,33 @@
             cutWire: function(wireIndex) {
                 if (!this.isActive) return;
                 
-                // 既に切れている場合は無視
                 if (this.currentCutState[wireIndex] === 1) return;
 
                 AudioMgr.playCut();
 
-                // UI反映
-                const slots = document.querySelectorAll('.wire-slot');
-                slots[wireIndex].classList.add('cut');
+                const slot = document.querySelectorAll('.wire-slot')[wireIndex];
+                const wire = slot.querySelector('.wire');
+                
+                // === 直線の角度をランダム生成 ===
+                // 角度をランダムに決定 (-15deg ~ 15deg 程度)
+                const angleTop = (Math.random() - 0.5) * 30;
+                const angleBottom = (Math.random() - 0.5) * 30;
+
+                // CSS変数に適用
+                wire.style.setProperty('--angle-top', `${angleTop}deg`);
+                wire.style.setProperty('--angle-bottom', `${angleBottom}deg`);
+
+                slot.classList.add('cut');
                 this.currentCutState[wireIndex] = 1;
 
-                // 判定
                 if (this.currentSolution[wireIndex] === 0) {
-                    // 不正解を切った
-                    this.gameOver();
+                    this.gameOver('explode');
                 } else {
-                    // 正解を切った -> まだ残っているか確認
                     this.checkProgress();
                 }
             },
 
             checkProgress: function() {
-                // 正解(1)なのに、まだ切っていない(0)ワイヤーがあるか？
                 let remaining = false;
                 for (let i = 0; i < 6; i++) {
                     if (this.currentSolution[i] === 1 && this.currentCutState[i] === 0) {
@@ -722,30 +640,33 @@
                 }
 
                 if (!remaining) {
-                    // 現在の問題クリア
                     this.problemCleared();
                 }
             },
 
             problemCleared: function() {
-                // 正解の本数をカウント (配列中の 1 の数)
                 const correctCount = this.currentSolution.filter(bit => bit === 1).length;
-                
-                // 回復量の計算: max(10 - ((正解数-1)*0.1), 1.0)
-                const recovery = Math.max(10 - ((correctCount - 1) * 0.1), 1.0);
+                const recovery = Math.max(5 - ((correctCount - 1) * 0.1), 1.0);
                 
                 this.timeLeft += recovery;
                 if(this.timeLeft > 99.99) this.timeLeft = 99.99;
                 
-                // 次へ
                 this.currentProblemIdx++;
                 this.loadProblem();
             },
 
-            gameOver: function() {
+            gameOver: function(reason) {
                 this.isActive = false;
                 clearInterval(this.timerId);
                 AudioMgr.playExplode();
+                
+                const textEl = document.getElementById('gameover-text');
+                if (reason === 'timeout') {
+                    textEl.innerText = "TIME OVER";
+                } else {
+                    textEl.innerText = "EXPLODED";
+                }
+
                 UI.showScreen('gameover');
             },
 
@@ -757,7 +678,6 @@
             }
         };
 
-        // 初期化
         window.onload = function() {
             AudioMgr.init();
         };
