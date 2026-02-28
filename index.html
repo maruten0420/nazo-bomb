@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -9,10 +10,8 @@
     <meta property="og:description" content="爆弾を解除せよ！スリリングなパズルゲーム。">
     <meta property="og:image" content="bakudan-banner.png">
     <meta property="og:type" content="website">
-    < Blue-Twitterカードの設定 -->
-    <meta name=" high-twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="_bakudan-banner.png">
-
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="bakudan-banner.png">
     <!-- デジタル時計風フォント -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&display=swap" rel="stylesheet">
     <style>
@@ -368,12 +367,14 @@
     <div id="gameover-screen" class="screen hidden">
         <div id="gameover-text" class="status-text text-explode">EXPLODED</div>
         <div class="btn" onclick="location.reload()">RETRY MISSION</div>
+        <div class="btn" onclick="Game.shareOnX()" style="background: #000; border-color: #555; margin-top: 10px;">REPORT X</div>
     </div>
 
     <div id="clear-screen" class="screen hidden" style="background: #001a00;">
         <div class="status-text text-clear">BOMB DEFUSED</div>
         <div style="margin-bottom:20px; color:#aaa;">All systems normalized.</div>
         <div class="btn" onclick="location.reload()">RETURN TO BASE</div>
+        <div class="btn" onclick="Game.shareOnX()" style="background: #000; border-color: #555; margin-top: 10px;">REPORT X</div>
     </div>
 
     <script>
@@ -695,6 +696,13 @@
                 clearInterval(this.timerId);
                 AudioMgr.playClear();
                 UI.showScreen('clear');
+            },
+
+            shareOnX: function() {
+                const count = this.currentProblemIdx;
+                const text = `私は${count}の爆弾を解除しました！\n↓あなたも爆弾を解除しよう↓\nhttps://maruten0420.github.io/nazo-bomb/\n#BOMB_DEFUSAL #謎解き`;
+                const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+                window.open(url, '_blank');
             }
         };
 
