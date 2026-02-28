@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -257,38 +256,49 @@
         }
 
         /* 切断されたワイヤーの描画 (直線バージョンに戻しました) */
-        .cut .wire::before,
-        .cut .wire::after {
+        /* 切断前の初期状態（透明でまっすぐ） */
+        .wire::before,
+        .wire::after {
             content: '';
             position: absolute;
             left: 50%;
-            width: 14px; /* ワイヤーの太さ */
+            width: 14px;
             height: 45%;
-            background: var(--wire-color); /* 背景色で描画 */
-            box-shadow: inset -4px 0 6px rgba(0,0,0,0.6), 4px 4px 6px rgba(0,0,0,0.6); /* 影も戻す */
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: translateX(-50%); /* 中央揃え */
+            background: var(--wire-color);
+            box-shadow: inset -4px 0 6px rgba(0,0,0,0.6), 4px 4px 6px rgba(0,0,0,0.6);
+            transform: translateX(-50%) rotate(0deg);
             border-radius: 4px;
+            opacity: 0; /* 切断されるまで隠す */
+            transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0), opacity 0.1s ease;
+            pointer-events: none;
+        }
+
+        /* 切断時の表示とアニメーション */
+        .cut .wire::before,
+        .cut .wire::after {
+            opacity: 1;
         }
 
         /* 上半分 */
-        .cut .wire::before {
+        .wire::before {
             top: 0; 
-            transform-origin: top center; /* 穴を支点に回転 */
-            transform: translateX(-50%) rotate(var(--angle-top)); 
-            
+            transform-origin: top center;
             /* 断面 */
             border-bottom: 4px solid #b87333; 
         }
+        .cut .wire::before {
+            transform: translateX(-50%) rotate(var(--angle-top)); 
+        }
 
         /* 下半分 */
-        .cut .wire::after {
+        .wire::after {
             bottom: 0;
-            transform-origin: bottom center; /* 穴を支点に回転 */
-            transform: translateX(-50%) rotate(var(--angle-bottom));
-
+            transform-origin: bottom center;
             /* 断面 */
             border-top: 4px solid #b87333;
+        }
+        .cut .wire::after {
+            transform: translateX(-50%) rotate(var(--angle-bottom));
         }
 
         /* 黒ワイヤーの場合だけborderが見えなくなるので微調整 */
@@ -367,14 +377,14 @@
     <div id="gameover-screen" class="screen hidden">
         <div id="gameover-text" class="status-text text-explode">EXPLODED</div>
         <div class="btn" onclick="location.reload()">RETRY MISSION</div>
-        <!-- <div class="btn" onclick="Game.shareOnX()" style="background: #000; border-color: #555; margin-top: 10px;">REPORT X</div> -->
+        <div class="btn" onclick="Game.shareOnX()" style="background: #000; border-color: #555; margin-top: 10px;">REPORT X</div>
     </div>
 
     <div id="clear-screen" class="screen hidden" style="background: #001a00;">
         <div class="status-text text-clear">BOMB DEFUSED</div>
         <div style="margin-bottom:20px; color:#aaa;">All systems normalized.</div>
         <div class="btn" onclick="location.reload()">RETURN TO BASE</div>
-        <!-- <div class="btn" onclick="Game.shareOnX()" style="background: #000; border-color: #555; margin-top: 10px;">REPORT X</div> -->
+        <div class="btn" onclick="Game.shareOnX()" style="background: #000; border-color: #555; margin-top: 10px;">REPORT X</div>
     </div>
 
     <script>
@@ -700,7 +710,7 @@
 
             shareOnX: function() {
                 const count = this.currentProblemIdx;
-                const text = `私は${count}個の爆弾を解除しました！\n↓あなたも爆弾を解除しよう↓\nhttps://maruten0420.github.io/nazo-bomb/\n#BOMB_DEFUSAL #謎解き`;
+                const text = `私は${count}の爆弾を解除しました！\n↓あなたも爆弾を解除しよう↓\nhttps://maruten0420.github.io/nazo-bomb/\n#BOMB_DEFUSAL #謎解き`;
                 const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
                 window.open(url, '_blank');
             }
